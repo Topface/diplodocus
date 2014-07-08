@@ -1,8 +1,8 @@
-# Tigger
+# Diplodocus
 
 Diplodocus allows you to `tail -F` text files over http.
 
-![Diplodocus](diplodocus?raw=true]
+![Diplodocus](diplodocus.gif?raw=true)
 
 
 ## Building
@@ -39,7 +39,7 @@ Hide it behind nginx or whatever proxy you like to manage access rights.
 ## Library
 
 Diplodocus also provides a library for you to use, see
-[cmd/diplodocus-server/main.go](server) code for example.
+[server](cmd/diplodocus-server/main.go) code for example.
 
 ## Authors
 
