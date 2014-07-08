@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"github.com/Topface/diplodocus"
-	"github.com/howeyc/fsnotify"
+	"github.com/fsnotify/fsnotify"
 	"log"
 	"net/http"
 	"os"
@@ -41,7 +41,7 @@ func main() {
 
 		if f.IsDir() {
 			log.Println("watching", path)
-			return watcher.Watch(path)
+			return watcher.Add(path)
 		}
 
 		return nil

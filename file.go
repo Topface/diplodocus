@@ -2,7 +2,7 @@ package diplodocus
 
 import (
 	"errors"
-	"github.com/howeyc/fsnotify"
+	"github.com/fsnotify/fsnotify"
 	"os"
 	"path"
 	"sync"
@@ -104,10 +104,10 @@ func (f *file) RemoveListener(listener Listener) {
 }
 
 // OnEvent should be called when event associated with this file happens.
-func (f *file) OnEvent(ev *fsnotify.FileEvent) {
+func (f *file) OnEvent(ev fsnotify.Event) {
 	f.mutex.Lock()
 
-	if ev.IsDelete() || ev.IsRename() {
+	if ev.Op & fsnotify.Remove == fsnotify.Remove || ev.Op & fsnotify.Rename == fsnotify.Rename {
 		f.file = nil
 		f.size = 0
 		if f.path != f.real {
@@ -115,6 +115,8 @@ func (f *file) OnEvent(ev *fsnotify.FileEvent) {
 		}
 
 		f.mutex.Unlock()
+
+		// file removed
 		return
 	}
 
@@ -127,7 +129,7 @@ func (f *file) OnEvent(ev *fsnotify.FileEvent) {
 		}
 	}
 
-	if ev.IsCreate() {
+	if ev.Op & fsnotify.Create == fsnotify.Create {
 		f.size = 0
 	}
 
@@ -153,7 +155,7 @@ func (f *file) OnEvent(ev *fsnotify.FileEvent) {
 	}
 
 	if f.size <= off {
-		f.fire(event{Error: errors.New("file truncated")})
+		// file truncated
 		return
 	}
 

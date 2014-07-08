@@ -1,7 +1,7 @@
 package diplodocus
 
 import (
-	"github.com/howeyc/fsnotify"
+	"github.com/fsnotify/fsnotify"
 	"sync"
 )
 
@@ -26,12 +26,12 @@ func NewFileManager(watcher *fsnotify.Watcher) *FileManager {
 func (m *FileManager) Watch() error {
 	for {
 		select {
-		case ev := <-m.watcher.Event:
+		case ev := <-m.watcher.Events:
 			files := m.responders.GetMappings(ev.Name)
 			for _, file := range files {
 				file.OnEvent(ev)
 			}
-		case err := <-m.watcher.Error:
+		case err := <-m.watcher.Errors:
 			return err
 		}
 	}
