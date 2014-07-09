@@ -107,7 +107,7 @@ func (f *file) RemoveListener(listener Listener) {
 func (f *file) OnEvent(ev fsnotify.Event) {
 	f.mutex.Lock()
 
-	if ev.Op & fsnotify.Remove == fsnotify.Remove || ev.Op & fsnotify.Rename == fsnotify.Rename {
+	if ev.Op&fsnotify.Remove == fsnotify.Remove || ev.Op&fsnotify.Rename == fsnotify.Rename {
 		f.file = nil
 		f.size = 0
 		if f.path != f.real {
@@ -129,7 +129,7 @@ func (f *file) OnEvent(ev fsnotify.Event) {
 		}
 	}
 
-	if ev.Op & fsnotify.Create == fsnotify.Create {
+	if ev.Op&fsnotify.Create == fsnotify.Create {
 		f.size = 0
 	}
 
