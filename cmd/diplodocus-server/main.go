@@ -23,14 +23,14 @@ func main() {
 
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("watcher creation error:", err)
 	}
 
 	m := diplodocus.NewFileManager(watcher)
 	go func() {
 		err := m.Watch()
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal("watch error:", err)
 		}
 	}()
 
@@ -48,7 +48,7 @@ func main() {
 	})
 
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("watch path adding error:", err)
 	}
 
 	mux := http.NewServeMux()
@@ -75,14 +75,14 @@ func main() {
 
 		for ev := range listener {
 			if ev.Error != nil {
-				log.Println("error for "+path, ev.Error)
+				log.Println("listener error for", path, ev.Error)
 				file.RemoveListener(listener)
 				return
 			}
 
 			_, err := w.Write(*ev.Buffer)
 			if err != nil {
-				log.Println("error for "+path, err)
+				log.Println("write error for", path, err)
 				file.RemoveListener(listener)
 				return
 			}
@@ -95,6 +95,6 @@ func main() {
 
 	err = http.ListenAndServe(*listen, mux)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("listen error:", err)
 	}
 }
