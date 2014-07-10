@@ -61,7 +61,7 @@ func main() {
 			return
 		}
 
-		listener := make(diplodocus.Listener)
+		listener := make(diplodocus.Listener, 10)
 		file.AddListener(listener)
 
 		log.Println("listener added for:", path)
@@ -89,6 +89,8 @@ func main() {
 
 			flusher.Flush()
 		}
+
+		log.Println("listener finished (probably timeout) for", path)
 	})
 
 	log.Println("listening", *listen)
