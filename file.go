@@ -21,6 +21,7 @@ type file struct {
 	responders *ResponderMap
 	mapped     bool
 	mutex      sync.Mutex
+	events     chan event
 }
 
 // newFile creates file for specified path and with specified responder.
@@ -28,7 +29,10 @@ func newFile(path string, responders *ResponderMap) (*file, error) {
 	f := &file{
 		path:       path,
 		responders: responders,
+		events:     make(chan event),
 	}
+
+	go f.readPipe()
 
 	err := f.open()
 	if err != nil {
@@ -124,7 +128,7 @@ func (f *file) OnEvent(ev fsnotify.Event) {
 		err := f.open()
 		if err != nil {
 			f.mutex.Unlock()
-			f.fire(event{Error: errors.New("file open failed")})
+			f.events <- event{Error: errors.New("file open failed")}
 			return
 		}
 	}
@@ -136,7 +140,7 @@ func (f *file) OnEvent(ev fsnotify.Event) {
 	stat, err := f.file.Stat()
 	if err != nil {
 		f.mutex.Unlock()
-		f.fire(event{Error: err})
+		f.events <- event{Error: err}
 		return
 	}
 
@@ -162,28 +166,38 @@ func (f *file) OnEvent(ev fsnotify.Event) {
 	buf := make([]byte, f.size-off)
 	_, err = f.file.ReadAt(buf, off)
 	if err != nil {
-		f.fire(event{Error: err})
+		f.events <- event{Error: err}
 		return
 	}
 
-	f.fire(event{Buffer: &buf})
+	f.events <- event{Buffer: &buf}
 }
 
-// fire sends event to every listener and handles timeouts.
-func (f *file) fire(ev event) {
-	f.mutex.Lock()
-	listeners := make([]Listener, len(f.listeners))
-	copy(listeners, f.listeners)
-	f.mutex.Unlock()
+// readPipe reads events from channel and distributes them among listeners.
+func (f *file) readPipe() {
+	for ev := range f.events {
+		f.mutex.Lock()
+		listeners := make([]Listener, len(f.listeners))
+		copy(listeners, f.listeners)
+		f.mutex.Unlock()
 
-	for _, listener := range listeners {
-		go func(listener Listener) {
-			select {
-			case listener <- ev:
-			case <-time.After(time.Second * 10):
-				f.RemoveListener(listener)
-				close(listener)
-			}
-		}(listener)
+		wg := sync.WaitGroup{}
+
+		for _, listener := range listeners {
+			wg.Add(1)
+
+			go func(listener Listener) {
+				select {
+				case listener <- ev:
+				case <-time.After(time.Second * 10):
+					f.RemoveListener(listener)
+					close(listener)
+				}
+
+				wg.Done()
+			}(listener)
+		}
+
+		wg.Wait()
 	}
 }
