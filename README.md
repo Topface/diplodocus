@@ -28,7 +28,7 @@ can be monitored with command like this:
 
 ```
 # monitor /var/log/whatever/example.com/access.log
-curl -s http://127.0.0.1:8000/example.com/access.log
+curl -sN http://127.0.0.1:8000/example.com/access.log
 ```
 
 Diplodocus will monitor for file updates, symlink changes
