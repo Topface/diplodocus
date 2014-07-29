@@ -10,6 +10,7 @@ Diplodocus allows you to `tail -F` text files over http.
 You will need [go compiler](http://golang.org/) installed.
 
 ```
+mkdir diplodocus
 cd diplodocus
 export GOPATH=`pwd`
 go get github.com/Topface/diplodocus/cmd/diplodocus-server
