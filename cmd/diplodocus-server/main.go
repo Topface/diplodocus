@@ -10,13 +10,12 @@ import (
 	"path/filepath"
 )
 
-var listen = flag.String("listen", "", "addreess to listen: 127.0.0.1:8000")
-var root = flag.String("root", "", "root dir for logs")
-
 func main() {
+	listen := flag.String("listen", "", "addreess to listen, example: 127.0.0.1:8000")
+	root := flag.String("root", "", "root dir for logs")
 	flag.Parse()
 
-	if *listen == "*" || *root == "" {
+	if *listen == "" || *root == "" {
 		flag.PrintDefaults()
 		return
 	}
