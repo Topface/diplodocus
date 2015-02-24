@@ -4,6 +4,21 @@ Diplodocus allows you to `tail -F` text files over http.
 
 ![Diplodocus](diplodocus.gif?raw=true)
 
+## Fast start with docker
+
+Expose files in `/var/log/whatever` on `192.168.0.7:8000`:
+
+```
+docker run -d -p 192.168.0.7:8000:8000 \
+    -v /var/log/whatever:/var/log/diplodocus \
+    bobrik/diplodocus -listen :8000
+```
+
+Now to follow `/var/log/whatever/mylog/mylog-2015-02-24.log`:
+
+```
+curl -v http://192.168.0.7:8000/mylog/mylog-2015-02-24.log
+```
 
 ## Building
 
