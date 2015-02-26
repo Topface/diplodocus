@@ -10,4 +10,6 @@ RUN apk-install go git && \
 
 VOLUME ["/var/log/diplodocus"]
 
-ENTRYPOINT ["/bin/diplodocus-server", "-root", "/var/log/diplodocus"]
+EXPOSE 8000
+
+ENTRYPOINT ["/bin/diplodocus-server", "-root", "/var/log/diplodocus", "-listen", ":8000"]
